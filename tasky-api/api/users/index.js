@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 
 
 const router = express.Router(); 
+const passwordVal = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -37,7 +38,15 @@ router.post('/', asyncHandler(async (req, res) => {
 
 async function registerUser(req, res) {
     // Add input validation logic here
-    await User.create(req.body);
+    const  {username, password} = req.body;
+
+    if (!passwordVal.test(password)) { //8 letters 1 upper 1 lower  1 digit  1 special ye
+        return res.status(400).json({
+            success: false,
+            msg: "password, nor met requirements."
+        });
+    }
+    await User.create({username, password});
     res.status(201).json({ success: true, msg: 'User successfully created.' });
 }
 
